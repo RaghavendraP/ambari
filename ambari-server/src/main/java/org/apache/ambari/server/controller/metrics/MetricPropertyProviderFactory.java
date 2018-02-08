@@ -64,6 +64,7 @@ public interface MetricPropertyProviderFactory {
       @Assisted("clusterNamePropertyId") String clusterNamePropertyId,
       @Assisted("hostNamePropertyId") @Nullable String hostNamePropertyId,
       @Assisted("componentNamePropertyId") String componentNamePropertyId,
+      @Assisted("componentTypePropertyId") String componentTypePropertyId,
       @Assisted("statePropertyId") @Nullable String statePropertyId);
 
   /**
@@ -98,6 +99,8 @@ public interface MetricPropertyProviderFactory {
       @Assisted("clusterNamePropertyId") String clusterNamePropertyId,
       @Assisted("hostNamePropertyId") @Nullable String hostNamePropertyId,
       @Assisted("componentNamePropertyId") String componentNamePropertyId,
+      @Assisted("componentTypePropertyId") String componentTypePropertyId,
       @Assisted("statePropertyId") @Nullable String statePropertyId,
-      @Assisted("componentName") @Nullable String componentName);
+      @Assisted("componentName") @Nullable String componentName,
+      @Assisted("componentType") @Nullable String componentType);
 }

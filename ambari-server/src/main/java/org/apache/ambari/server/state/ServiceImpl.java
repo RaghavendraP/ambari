@@ -337,9 +337,9 @@ public class ServiceImpl implements Service {
   }
 
   @Override
-  public ServiceComponent addServiceComponent(String serviceComponentName)
+  public ServiceComponent addServiceComponent(String serviceComponentName, String serviceComponentType)
       throws AmbariException {
-    ServiceComponent component = serviceComponentFactory.createNew(this, serviceComponentName);
+    ServiceComponent component = serviceComponentFactory.createNew(this, serviceComponentName, serviceComponentType);
     addServiceComponent(component);
     return component;
   }

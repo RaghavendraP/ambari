@@ -33,12 +33,13 @@ public interface JMXHostProvider {
    * Get the JMX host names for the given cluster name and component name.
    *
    * @param clusterName    the cluster name
+   * @param componentType  the component type
    * @param componentName  the component name
    *
    * @return set of JMX host names
    *
    */
-  Set<String> getHostNames(String clusterName, String componentName);
+  Set<String> getHostNames(String clusterName, String componentType, String componentName);
 
   /**
    * Get cluster host info given the host name

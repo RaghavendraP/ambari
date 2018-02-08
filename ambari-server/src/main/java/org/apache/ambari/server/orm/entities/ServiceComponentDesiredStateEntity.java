@@ -62,7 +62,8 @@ import org.apache.ambari.server.state.State;
     query = "SELECT scds FROM ServiceComponentDesiredStateEntity scds WHERE scds.clusterId = :clusterId " +
       "AND scds.serviceGroupId = :serviceGroupId " +
       "AND scds.serviceId = :serviceId " +
-      "AND scds.componentName = :componentName") })
+      "AND scds.componentName = :componentName " +
+      "AND scds.componentType = :componentType" ) })
 public class ServiceComponentDesiredStateEntity {
 
   @Id
@@ -74,6 +75,9 @@ public class ServiceComponentDesiredStateEntity {
 
   @Column(name = "component_name", nullable = false, insertable = true, updatable = true)
   private String componentName;
+
+  @Column(name = "component_type", nullable = false, insertable = true, updatable = true)
+  private String componentType;
 
   @Column(name = "cluster_id", nullable = false, insertable = false, updatable = false, length = 10)
   private Long clusterId;
@@ -153,6 +157,14 @@ public class ServiceComponentDesiredStateEntity {
 
   public void setComponentName(String componentName) {
     this.componentName = componentName;
+  }
+
+  public String getComponentType() {
+    return componentType;
+  }
+
+  public void setComponentType(String componentType) {
+    this.componentType = componentType;
   }
 
   public State getDesiredState() {
@@ -237,6 +249,9 @@ public class ServiceComponentDesiredStateEntity {
     if (componentName != null ? !componentName.equals(that.componentName) : that.componentName != null) {
       return false;
     }
+    if (componentType != null ? !componentType.equals(that.componentType) : that.componentType != null) {
+      return false;
+    }
     if (desiredState != null ? !desiredState.equals(that.desiredState) : that.desiredState != null) {
       return false;
     }
@@ -254,6 +269,7 @@ public class ServiceComponentDesiredStateEntity {
     result = 31 * result + (serviceGroupId != null ? serviceGroupId.hashCode() : 0);
     result = 31 * result + (serviceId != null ? serviceId.hashCode() : 0);
     result = 31 * result + (componentName != null ? componentName.hashCode() : 0);
+    result = 31 * result + (componentType != null ? componentType.hashCode() : 0);
     result = 31 * result + (desiredState != null ? desiredState.hashCode() : 0);
     result = 31 * result + (desiredRepositoryVersion != null ? desiredRepositoryVersion.hashCode() : 0);
 

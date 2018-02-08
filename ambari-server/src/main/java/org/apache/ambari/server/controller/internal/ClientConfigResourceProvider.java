@@ -120,6 +120,7 @@ public class ClientConfigResourceProvider extends AbstractControllerResourceProv
   protected static final String COMPONENT_SERVICE_GROUP_NAME_PROPERTY_ID = "ServiceComponentInfo/service_group_name";
   protected static final String COMPONENT_SERVICE_NAME_PROPERTY_ID = "ServiceComponentInfo/service_name";
   protected static final String COMPONENT_COMPONENT_NAME_PROPERTY_ID = "ServiceComponentInfo/component_name";
+  protected static final String COMPONENT_COMPONENT_TYPE_PROPERTY_ID = "ServiceComponentInfo/component_type";
   protected static final String HOST_COMPONENT_HOST_NAME_PROPERTY_ID =
           PropertyHelper.getPropertyId("HostRoles", "host_name");
 
@@ -915,6 +916,7 @@ public class ClientConfigResourceProvider extends AbstractControllerResourceProv
             (String) properties.get(COMPONENT_SERVICE_GROUP_NAME_PROPERTY_ID),
             (String) properties.get(COMPONENT_SERVICE_NAME_PROPERTY_ID),
             (String) properties.get(COMPONENT_COMPONENT_NAME_PROPERTY_ID),
+            (String) properties.get(COMPONENT_COMPONENT_TYPE_PROPERTY_ID),
             (String) properties.get(HOST_COMPONENT_HOST_NAME_PROPERTY_ID),
             null);
   }

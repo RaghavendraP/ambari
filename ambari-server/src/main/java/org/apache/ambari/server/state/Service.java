@@ -72,7 +72,7 @@ public interface Service {
 
   void debugDump(StringBuilder sb);
 
-  ServiceComponent addServiceComponent(String serviceComponentName)
+  ServiceComponent addServiceComponent(String serviceComponentName, String serviceComponentType)
       throws AmbariException;
 
   /**

@@ -639,7 +639,7 @@ public class AmbariManagementControllerImpl implements AmbariManagementControlle
 
       if (StringUtils.isEmpty(request.getServiceName())) {
         try {
-          request.setServiceName(findService(cluster, request.getComponentName()));
+          request.setServiceName(findService(cluster, request.getComponentType()));
         } catch (ServiceNotFoundException e) {
           // handled below
         }
@@ -647,8 +647,10 @@ public class AmbariManagementControllerImpl implements AmbariManagementControlle
       }
 
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Received a createHostComponent request, clusterName={}, serviceGroupName={}, serviceName={}, componentName={}, hostname={}, request={}",
-          request.getClusterName(), request.getServiceGroupName(), request.getServiceName(), request.getComponentName(), request.getHostname(), request);
+        LOG.debug("Received a createHostComponent request, clusterName={}, serviceGroupName={}, serviceName={}, " +
+                  "componentName={}, componentType={}, hostname={}, request={}", request.getClusterName(),
+                  request.getServiceGroupName(), request.getServiceName(), request.getComponentName(),
+                  request.getComponentType(), request.getHostname(), request);
       }
 
       if (!hostComponentNames.containsKey(request.getClusterName())) {
@@ -1254,22 +1256,22 @@ public class AmbariManagementControllerImpl implements AmbariManagementControlle
       }
     }
 
-    if (request.getComponentName() != null) {
+    if (request.getComponentName() != null && request.getComponentType() != null) {
       if (StringUtils.isBlank(request.getServiceName())) {
 
         // !!! FIXME the assumption that a component is unique across all stacks is a ticking
         // time bomb.  Blueprints are making this assumption.
         String serviceName = "";
         try {
-          serviceName = findService(cluster, request.getComponentName());
+          serviceName = findService(cluster, request.getComponentType());
         } catch (ServiceNotFoundException e) {
           // handled below
         }
 
         if (StringUtils.isBlank(serviceName)) {
-          LOG.error("Unable to find service for component {}", request.getComponentName());
+          LOG.error("Unable to find service for component type : {}", request.getComponentName());
           throw new ServiceComponentHostNotFoundException(
-              cluster.getClusterName(), null, request.getComponentName(), request.getHostname());
+              cluster.getClusterName(), null, request.getComponentType(), request.getHostname());
         }
 
         request.setServiceName(serviceName);
@@ -1322,6 +1324,7 @@ public class AmbariManagementControllerImpl implements AmbariManagementControlle
       // filter on component name if provided
       Set<ServiceComponent> components = new HashSet<>();
       if (request.getComponentName() != null) {
+        // TODO : SWAP - confirm that we add name and not type
         components.add(s.getServiceComponent(request.getComponentName()));
       } else {
         components.addAll(s.getServiceComponents().values());
@@ -1388,6 +1391,7 @@ public class AmbariManagementControllerImpl implements AmbariManagementControlle
 
             response.add(r);
           } catch (ServiceComponentHostNotFoundException e) {
+            // TODO : SWAP SHould type be also mentioned here
             if (request.getServiceName() == null || request.getComponentName() == null) {
               // Ignore the exception if either the service name or component name are not specified.
               // This is an artifact of how we get host_components and can happen in the case where
@@ -3562,10 +3566,12 @@ public class AmbariManagementControllerImpl implements AmbariManagementControlle
         || request.getClusterName().isEmpty()
         || request.getComponentName() == null
         || request.getComponentName().isEmpty()
+        || request.getComponentType() == null
+        || request.getComponentType().isEmpty()
         || request.getHostname() == null
         || request.getHostname().isEmpty()) {
       throw new IllegalArgumentException("Invalid arguments"
-          + ", cluster name, component name and host name should be"
+          + ", cluster name, component name, component type and host name should be"
           + " provided");
     }
 
@@ -3636,7 +3642,7 @@ public class AmbariManagementControllerImpl implements AmbariManagementControlle
         for (ServiceComponentHost sch : cluster.getServiceComponentHosts(request.getHostname())) {
           ServiceComponentHostRequest schr = new ServiceComponentHostRequest(request.getClusterName(),
                   request.getServiceGroupName(), sch.getServiceName(), sch.getServiceComponentName(),
-                  sch.getHostName(), null);
+                  sch.getServiceComponentType(), sch.getHostName(), null);
           expanded.add(schr);
         }
       }
@@ -3655,18 +3661,19 @@ public class AmbariManagementControllerImpl implements AmbariManagementControlle
       Cluster cluster = clusters.getCluster(request.getClusterName());
 
       if (StringUtils.isEmpty(request.getServiceName())) {
-        request.setServiceName(findService(cluster, request.getComponentName()));
+        request.setServiceName(findService(cluster, request.getComponentType()));
       }
 
       LOG.info("Received a hostComponent DELETE request"
         + ", clusterName=" + request.getClusterName()
         + ", serviceName=" + request.getServiceName()
         + ", componentName=" + request.getComponentName()
+        + ", componentHost=" + request.getComponentType()
         + ", hostname=" + request.getHostname()
         + ", request=" + request);
 
       Service service = cluster.getService(request.getServiceName());
-      ServiceComponent component = service.getServiceComponent(request.getComponentName());
+      ServiceComponent component = service.getServiceComponent(request.getComponentType());
       ServiceComponentHost componentHost = component.getServiceComponentHost(request.getHostname());
 
       setRestartRequiredServices(service, request.getComponentName());

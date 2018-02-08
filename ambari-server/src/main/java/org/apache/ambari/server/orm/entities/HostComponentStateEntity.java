@@ -77,8 +77,8 @@ import com.google.common.base.Objects;
     @NamedQuery(
         name = "HostComponentStateEntity.findByIndex",
         query = "SELECT hcs from HostComponentStateEntity hcs WHERE hcs.clusterId=:clusterId " +
-                "AND hcs.serviceGroupId=:serviceGroupId AND hcs.serviceId=:serviceId AND hcs.componentName=:componentName AND hcs.hostId=:hostId") })
-
+                "AND hcs.serviceGroupId=:serviceGroupId AND hcs.serviceId=:serviceId AND hcs.id=:id AND hcs.hostId=:hostId") })
+// TODO : SWAP - Named quesry above by component type ?
 public class HostComponentStateEntity {
 
   @Id
@@ -101,6 +101,9 @@ public class HostComponentStateEntity {
   @Column(name = "component_name", nullable = false, insertable = false, updatable = false)
   private String componentName;
 
+  @Column(name = "component_type", nullable = false, insertable = false, updatable = false)
+  private String componentType;
+
   /**
    * Version reported by host component during last status update.
    */
@@ -115,12 +118,16 @@ public class HostComponentStateEntity {
   @Column(name = "upgrade_state", nullable = false, insertable = true, updatable = true)
   private UpgradeState upgradeState = UpgradeState.NONE;
 
+  //TODO: SWAP - Should we have component_name here or remove it ?
+
   @ManyToOne
   @JoinColumns({
+    //@JoinColumn(name = "id", referencedColumnName = "id", nullable = false),
     @JoinColumn(name = "cluster_id", referencedColumnName = "cluster_id", nullable = false),
     @JoinColumn(name = "service_group_id", referencedColumnName = "service_group_id", nullable = false),
     @JoinColumn(name = "service_id", referencedColumnName = "service_id", nullable = false),
-    @JoinColumn(name = "component_name", referencedColumnName = "component_name", nullable = false) })
+    @JoinColumn(name = "component_name", referencedColumnName = "component_name", nullable = false),
+    @JoinColumn(name = "component_type", referencedColumnName = "component_type", nullable = false) })
   private ServiceComponentDesiredStateEntity serviceComponentDesiredStateEntity;
 
   @ManyToOne
@@ -169,6 +176,14 @@ public class HostComponentStateEntity {
 
   public void setComponentName(String componentName) {
     this.componentName = componentName;
+  }
+
+  public void setComponentType(String componentType) {
+    this.componentType = componentType;
+  }
+
+  public String getComponentType() {
+    return componentType;
   }
 
   public State getCurrentState() {
@@ -228,6 +243,11 @@ public class HostComponentStateEntity {
       return false;
     }
 
+    if (componentType != null ? !componentType.equals(that.componentType)
+            : that.componentType != null) {
+      return false;
+    }
+
     if (currentState != null ? !currentState.equals(that.currentState)
         : that.currentState != null) {
       return false;
@@ -257,6 +277,7 @@ public class HostComponentStateEntity {
     result = 31 * result + (serviceId != null ? serviceId.intValue() : 0);
     result = 31 * result + (hostEntity != null ? hostEntity.hashCode() : 0);
     result = 31 * result + (componentName != null ? componentName.hashCode() : 0);
+    result = 31 * result + (componentType != null ? componentType.hashCode() : 0);
     result = 31 * result + (currentState != null ? currentState.hashCode() : 0);
     result = 31 * result + (upgradeState != null ? upgradeState.hashCode() : 0);
     result = 31 * result + (version != null ? version.hashCode() : 0);
@@ -286,8 +307,8 @@ public class HostComponentStateEntity {
   @Override
   public String toString() {
     return Objects.toStringHelper(this).add("clusterId", clusterId).add("serviceGroupId", serviceGroupId).add(
-      "serviceId", serviceId).add("componentName", componentName).add(
-      "hostId", hostId).add("state", currentState).toString();
+      "serviceId", serviceId).add("componentId", id).add("componentName", componentName).add
+            ("componentType", componentType).add("hostId", hostId).add("state", currentState).toString();
   }
 
 }

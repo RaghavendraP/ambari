@@ -790,6 +790,7 @@ public class ServiceComponentHostImpl implements ServiceComponentHost {
     stateEntity.setServiceGroupId(serviceComponent.getServiceGroupId());
     stateEntity.setServiceId(serviceComponent.getServiceId());
     stateEntity.setComponentName(serviceComponent.getName());
+    stateEntity.setComponentType(serviceComponent.getType());
     stateEntity.setVersion(State.UNKNOWN.toString());
     stateEntity.setHostEntity(hostEntity);
     stateEntity.setCurrentState(stateMachine.getCurrentState());
@@ -1001,6 +1002,11 @@ public class ServiceComponentHostImpl implements ServiceComponentHost {
   }
 
   @Override
+  public String getServiceComponentType() {
+    return serviceComponent.getType();
+  }
+
+  @Override
   public String getHostName() {
     return host.getHostName();
   }
@@ -1185,6 +1191,8 @@ public class ServiceComponentHostImpl implements ServiceComponentHost {
       e.printStackTrace();
     }
     String serviceComponentName = serviceComponent.getName();
+    String serviceComponentType = serviceComponent.getType();
+
     Long hostComponentId = getHostComponentId();
     String hostName = getHostName();
     String publicHostName = hostEntity.getPublicHostName();
@@ -1197,6 +1205,7 @@ public class ServiceComponentHostImpl implements ServiceComponentHost {
     String displayName = null;
     try {
       StackId stackVersion = serviceComponent.getDesiredStackId();
+      // TODO: SWAP -  Check if we need to pass componentType. I assume the name to be unique
       ComponentInfo compInfo = ambariMetaInfo.getComponent(stackVersion.getStackName(),
               stackVersion.getStackVersion(), service.getServiceType(), serviceComponentName);
       displayName = compInfo.getDisplayName();
@@ -1212,8 +1221,8 @@ public class ServiceComponentHostImpl implements ServiceComponentHost {
 
     ServiceComponentHostResponse r = new ServiceComponentHostResponse(clusterId, clusterName, service.getServiceGroupId(),
             service.getServiceGroupName(), service.getServiceId(), service.getName(), service.getServiceType(),
-            hostComponentId, serviceComponentName, displayName, hostName, publicHostName, state, getVersion(),
-            desiredState, desiredStackId, desiredRepositoryVersion, componentAdminState);
+            hostComponentId, serviceComponentName, serviceComponentType, displayName, hostName, publicHostName, state,
+            getVersion(), desiredState, desiredStackId, desiredRepositoryVersion, componentAdminState);
 
     r.setActualConfigs(actualConfigs);
     r.setUpgradeState(upgradeState);
@@ -1246,6 +1255,8 @@ public class ServiceComponentHostImpl implements ServiceComponentHost {
     sb.append("ServiceComponentHost={ hostname=").append(getHostName())
     .append(", serviceComponentName=")
     .append(serviceComponent.getName())
+    .append(", serviceComponentType=")
+    .append(serviceComponent.getType())
     .append(", clusterName=")
     .append(serviceComponent.getClusterName())
     .append(", serviceName=")
@@ -1266,7 +1277,7 @@ public class ServiceComponentHostImpl implements ServiceComponentHost {
       HostComponentDesiredStateEntity desiredStateEntity) {
     ServiceComponentDesiredStateEntity serviceComponentDesiredStateEntity = serviceComponentDesiredStateDAO.findByName(
         serviceComponent.getClusterId(), serviceComponent.getServiceGroupId(), serviceComponent.getServiceId(),
-        serviceComponent.getName());
+        serviceComponent.getName(), serviceComponent.getType());
 
     desiredStateEntity.setServiceComponentDesiredStateEntity(serviceComponentDesiredStateEntity);
     desiredStateEntity.setHostEntity(hostEntity);

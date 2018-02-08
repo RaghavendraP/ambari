@@ -1183,7 +1183,6 @@ public class ClusterImpl implements Cluster {
     throw new ServiceNotFoundException(getClusterName(), "component: " + componentName);
   }
 
-
   @Override
   public ServiceGroup getServiceGroup(String serviceGroupName) throws ServiceGroupNotFoundException {
 

@@ -86,6 +86,7 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
   private String clusterNamePropertyId = null;
   private String hostNamePropertyId = null;
   private String componentNamePropertyId = null;
+  private String componentTypePropertyId = null;
   private String resourceStatePropertyId = null;
   private ComponentSSLConfiguration sslConfig = null;
   private URLStreamProvider streamProvider = null;
@@ -119,6 +120,7 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
                                       String clusterPropertyId,
                                       String hostPropertyId,
                                       String componentPropertyId,
+                                      String componentTypePropertyId,
                                       String resourceStatePropertyId,
                                       PropertyProvider defaultJmxPropertyProvider,
                                       PropertyProvider defaultGangliaPropertyProvider) {
@@ -138,6 +140,7 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
     clusterNamePropertyId = clusterPropertyId;
     hostNamePropertyId = hostPropertyId;
     componentNamePropertyId = componentPropertyId;
+    componentTypePropertyId = componentTypePropertyId;
     this.resourceStatePropertyId = resourceStatePropertyId;
     this.jmxHostProvider = jmxHostProvider;
     sslConfig = ComponentSSLConfiguration.instance();
@@ -152,6 +155,7 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
       Request request, Predicate predicate) throws SystemException {
 
     // only arrange for one instance of Ganglia and JMX instantiation
+
     Map<String, Map<String, PropertyInfo>> gangliaMap = new HashMap<>();
     Map<String, Map<String, PropertyInfo>> jmxMap = new HashMap<>();
 
@@ -162,6 +166,7 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
       for (Resource r : resources) {
         String clusterName = r.getPropertyValue(clusterNamePropertyId).toString();
         String componentName = r.getPropertyValue(componentNamePropertyId).toString();
+        String componentType = r.getPropertyValue(componentTypePropertyId).toString();
 
         Cluster cluster = clusters.getCluster(clusterName);
         Service service = null;
@@ -192,8 +197,8 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
             PropertyProvider pp = getDelegate(m,
                 streamProvider, metricHostProvider,
                 clusterNamePropertyId, hostNamePropertyId,
-                componentNamePropertyId, resourceStatePropertyId,
-                componentName);
+                componentNamePropertyId, componentTypePropertyId, resourceStatePropertyId,
+                componentName, componentType);
             if (pp == null) {
               pp = getDelegate(m);
             }
@@ -224,7 +229,7 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
             streamProvider,
             jmxHostProvider, metricHostProvider,
             clusterNamePropertyId, hostNamePropertyId,
-            componentNamePropertyId, resourceStatePropertyId);
+            componentNamePropertyId, componentTypePropertyId, resourceStatePropertyId);
 
         jpp.populateResources(resources, request, predicate);
       } else {
@@ -333,8 +338,10 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
                                        String clusterNamePropertyId,
                                        String hostNamePropertyId,
                                        String componentNamePropertyId,
+                                       String componentTypePropertyId,
                                        String statePropertyId,
-                                       String componentName) {
+                                       String componentName,
+                                       String componentType) {
     Map<String, PropertyInfo> metrics = getPropertyInfo(definition);
     HashMap<String, Map<String, PropertyInfo>> componentMetrics =
       new HashMap<>();
@@ -347,8 +354,8 @@ public class StackDefinedPropertyProvider implements PropertyProvider {
       if (clz.equals(RestMetricsPropertyProvider.class)) {
         return metricPropertyProviderFactory.createRESTMetricsPropertyProvider(
             definition.getProperties(), componentMetrics, streamProvider, metricsHostProvider,
-            clusterNamePropertyId, hostNamePropertyId, componentNamePropertyId, statePropertyId,
-            componentName);
+            clusterNamePropertyId, hostNamePropertyId, componentNamePropertyId, componentTypePropertyId, statePropertyId,
+            componentName, componentType);
       }
 
       try {

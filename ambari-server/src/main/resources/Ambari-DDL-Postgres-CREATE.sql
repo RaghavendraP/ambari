@@ -269,6 +269,7 @@ CREATE TABLE repo_tags (
 CREATE TABLE servicecomponentdesiredstate (
   id BIGINT NOT NULL,
   component_name VARCHAR(255) NOT NULL,
+  component_type VARCHAR(255) NOT NULL,
   cluster_id BIGINT NOT NULL,
   service_group_id BIGINT NOT NULL,
   service_id BIGINT NOT NULL,
@@ -285,6 +286,7 @@ CREATE TABLE hostcomponentdesiredstate (
   id BIGINT NOT NULL,
   cluster_id BIGINT NOT NULL,
   component_name VARCHAR(255) NOT NULL,
+  component_type VARCHAR(255) NOT NULL,
   desired_state VARCHAR(255) NOT NULL,
   host_id BIGINT NOT NULL,
   service_group_id BIGINT NOT NULL,
@@ -301,6 +303,7 @@ CREATE TABLE hostcomponentstate (
   id BIGINT NOT NULL,
   cluster_id BIGINT NOT NULL,
   component_name VARCHAR(255) NOT NULL,
+  component_type VARCHAR(255) NOT NULL,
   version VARCHAR(32) NOT NULL DEFAULT 'UNKNOWN',
   current_state VARCHAR(255) NOT NULL,
   host_id BIGINT NOT NULL,
@@ -1290,7 +1293,8 @@ INSERT INTO ambari_sequences (sequence_name, sequence_value) VALUES
   ('hostgroup_component_id_seq', 0);
   ('repo_os_id_seq', 0),
   ('repo_definition_id_seq', 0),
-  ('hostcomponentdesiredstate_id_seq', 0);
+  ('hostcomponentdesiredstate_id_seq', 0),
+  ('viewurl_id_seq', '0');
 
 INSERT INTO adminresourcetype (resource_type_id, resource_type_name) VALUES
   (1, 'AMBARI'),

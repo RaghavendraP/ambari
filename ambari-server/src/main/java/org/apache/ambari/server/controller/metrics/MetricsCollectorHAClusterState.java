@@ -64,7 +64,7 @@ public class MetricsCollectorHAClusterState {
 
   public void addMetricsCollectorHost(String collectorHost) {
     if (HostStatusHelper.isHostComponentLive(managementController, clusterName, collectorHost, "AMBARI_METRICS",
-      Role.METRICS_COLLECTOR.name())) {
+      Role.METRICS_COLLECTOR.name(), Role.METRICS_COLLECTOR.name())) {
       liveCollectorHosts.add(collectorHost);
       deadCollectorHosts.remove(collectorHost);
     } else {
@@ -75,7 +75,7 @@ public class MetricsCollectorHAClusterState {
     //If there is no current collector host or the current host is down, this will be a proactive switch.
     if (currentCollectorHost == null || !HostStatusHelper.isHostComponentLive(managementController, clusterName,
       currentCollectorHost, "AMBARI_METRICS",
-      Role.METRICS_COLLECTOR.name())) {
+      Role.METRICS_COLLECTOR.name(), Role.METRICS_COLLECTOR.name())) {
       refreshCollectorHost(currentCollectorHost);
     }
   }
@@ -146,7 +146,7 @@ public class MetricsCollectorHAClusterState {
     return ((collectorHost != null) &&
       HostStatusHelper.isHostLive(managementController, clusterName, collectorHost) &&
       HostStatusHelper.isHostComponentLive(managementController, clusterName, collectorHost, "AMBARI_METRICS",
-        Role.METRICS_COLLECTOR.name()));
+        Role.METRICS_COLLECTOR.name(), Role.METRICS_COLLECTOR.name()));
   }
 
   /*
@@ -186,7 +186,7 @@ public class MetricsCollectorHAClusterState {
     //Check in live hosts
     for (String host : liveCollectorHosts) {
       if (HostStatusHelper.isHostComponentLive(managementController, clusterName, host, "AMBARI_METRICS",
-        Role.METRICS_COLLECTOR.name())) {
+        Role.METRICS_COLLECTOR.name(), Role.METRICS_COLLECTOR.name())) {
         return true;
       }
     }
@@ -194,7 +194,7 @@ public class MetricsCollectorHAClusterState {
     //Check in dead hosts. Don't update live and dead lists. Can be done on refresh call.
     for (String host : deadCollectorHosts) {
       if (HostStatusHelper.isHostComponentLive(managementController, clusterName, host, "AMBARI_METRICS",
-        Role.METRICS_COLLECTOR.name())) {
+        Role.METRICS_COLLECTOR.name(), Role.METRICS_COLLECTOR.name())) {
         return true;
       }
     }

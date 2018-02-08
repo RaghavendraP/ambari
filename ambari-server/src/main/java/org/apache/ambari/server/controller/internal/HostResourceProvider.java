@@ -952,6 +952,7 @@ public class HostResourceProvider extends AbstractControllerResourceProvider {
                                                                              sch.getServiceGroupName(),
                                                                              sch.getServiceName(),
                                                                              sch.getServiceComponentName(),
+                                                                             sch.getServiceComponentType(),
                                                                              sch.getHostName(),
                                                                              null);
           schrs.add(schr);

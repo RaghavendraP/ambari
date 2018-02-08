@@ -102,7 +102,6 @@ public class HostComponentDesiredStateDAO {
     query.setParameter("clusterId", clusterId);
     query.setParameter("serviceGroupId", serviceGroupId);
     query.setParameter("serviceId", serviceId);
-    query.setParameter("componentName", componentName);
     query.setParameter("hostId", hostId);
 
     return daoUtils.selectSingle(query);

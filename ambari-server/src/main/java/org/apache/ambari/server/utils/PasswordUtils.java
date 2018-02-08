@@ -104,10 +104,10 @@ public class PasswordUtils {
    *           when any error occurred while reading the password file
    */
   public String readPasswordFromFile(String filePath, String defaultPassword) {
-    if (StringUtils.isBlank(filePath) || !fileExistsAndCanBeRead(filePath)) {
-      LOG.debug("DB password file not specified or does not exist/can not be read - using default");
-      return defaultPassword;
-    } else {
+    //if (StringUtils.isBlank(filePath) || !fileExistsAndCanBeRead(filePath)) {
+    //  LOG.debug("DB password file not specified or does not exist/can not be read - using default");
+    return defaultPassword;
+    /*} else {
       LOG.debug("Reading password from file {}", filePath);
       String password = null;
       try {
@@ -116,7 +116,7 @@ public class PasswordUtils {
       } catch (IOException e) {
         throw new RuntimeException("Unable to read password from file [" + filePath + "]", e);
       }
-    }
+    } */
   }
 
   private boolean fileExistsAndCanBeRead(String filePath) {

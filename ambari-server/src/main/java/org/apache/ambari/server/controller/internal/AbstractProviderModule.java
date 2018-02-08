@@ -474,11 +474,11 @@ public abstract class AbstractProviderModule implements ProviderModule,
   }
 
   @Override
-  public Set<String> getHostNames(String clusterName, String componentName) {
+  public Set<String> getHostNames(String clusterName, String componentType, String componentName) {
     Set<String> hosts = null;
     try {
       Cluster cluster = managementController.getClusters().getCluster(clusterName);
-      String serviceName = managementController.findService(cluster, componentName);
+      String serviceName = managementController.findService(cluster, componentType);
       hosts = cluster.getService(serviceName).getServiceComponent(componentName).getServiceComponentHosts().keySet();
     } catch (Exception e) {
       LOG.warn("Exception in getting host names for jmx metrics: ", e);
@@ -508,7 +508,7 @@ public abstract class AbstractProviderModule implements ProviderModule,
 
     if (service.equals(GANGLIA)) {
       return HostStatusHelper.isHostComponentLive(managementController, clusterName, collectorHostName, "GANGLIA",
-        Role.GANGLIA_SERVER.name());
+        Role.GANGLIA_SERVER.name(), Role.GANGLIA_SERVER.name());
     } else if (service.equals(TIMELINE_METRICS)) {
       return metricsCollectorHAManager.isCollectorComponentLive(clusterName);
     }
@@ -762,6 +762,7 @@ public abstract class AbstractProviderModule implements ProviderModule,
               PropertyHelper.getPropertyId("ServiceComponentInfo", "cluster_name"),
               null,
               PropertyHelper.getPropertyId("ServiceComponentInfo", "component_name"),
+              PropertyHelper.getPropertyId("ServiceComponentInfo", "component_type"),
               PropertyHelper.getPropertyId("ServiceComponentInfo", "state"));
           PropertyProvider gpp = null;
           gpp = createMetricsComponentPropertyProvider(
@@ -781,6 +782,7 @@ public abstract class AbstractProviderModule implements ProviderModule,
               PropertyHelper.getPropertyId("ServiceComponentInfo", "cluster_name"),
               null,
               PropertyHelper.getPropertyId("ServiceComponentInfo", "component_name"),
+              PropertyHelper.getPropertyId("ServiceComponentInfo", "component_type"),
               PropertyHelper.getPropertyId("ServiceComponentInfo", "state"),
               jpp,
               gpp));
@@ -796,6 +798,7 @@ public abstract class AbstractProviderModule implements ProviderModule,
               PropertyHelper.getPropertyId("HostRoles", "cluster_name"),
               PropertyHelper.getPropertyId("HostRoles", "host_name"),
               PropertyHelper.getPropertyId("HostRoles", "component_name"),
+              PropertyHelper.getPropertyId("HostRoles", "component_type"),
               PropertyHelper.getPropertyId("HostRoles", "state"));
           PropertyProvider gpp = null;
           gpp = createMetricsHostComponentPropertyProvider(
@@ -817,6 +820,7 @@ public abstract class AbstractProviderModule implements ProviderModule,
               PropertyHelper.getPropertyId("HostRoles", "cluster_name"),
               PropertyHelper.getPropertyId("HostRoles", "host_name"),
               PropertyHelper.getPropertyId("HostRoles", "component_name"),
+              PropertyHelper.getPropertyId("HostRoles", "component_type"),
               PropertyHelper.getPropertyId("HostRoles", "state"),
               jpp,
               gpp));
@@ -891,16 +895,17 @@ public abstract class AbstractProviderModule implements ProviderModule,
       List<ServiceComponentHost> serviceComponentHosts = cluster.getServiceComponentHosts();
       if (!CollectionUtils.isEmpty(serviceComponentHosts)) {
         for (ServiceComponentHost sch : serviceComponentHosts) {
+          String componentType = sch.getServiceComponentType();
           String componentName = sch.getServiceComponentName();
           String hostName = sch.getHostName();
 
           hostComponentMap.put(componentName, hostName);
 
           // record the Ganglia server for the current cluster
-          if (componentName.equals(GANGLIA_SERVER)) {
+          if (componentType.equals(GANGLIA_SERVER)) {
             clusterGangliaCollectorMap.put(clusterName, hostName);
           }
-          if (componentName.equals(METRIC_SERVER)) {
+          if (componentType.equals(METRIC_SERVER)) {
             //  If current collector host is null or if the host or the host component not live
             //  Update clusterMetricCollectorMap.
             metricsCollectorHAManager.addCollectorHost(clusterName, hostName);
@@ -1044,12 +1049,13 @@ public abstract class AbstractProviderModule implements ProviderModule,
                                                      String clusterNamePropertyId,
                                                      String hostNamePropertyId,
                                                      String componentNamePropertyId,
+                                                     String componentTypePropertyId,
                                                      String statePropertyId) {
 
     return metricPropertyProviderFactory.createJMXPropertyProvider(
         PropertyHelper.getJMXPropertyIds(type), streamProvider,
         jmxHostProvider, metricsHostProvider, clusterNamePropertyId, hostNamePropertyId,
-        componentNamePropertyId, statePropertyId);
+        componentNamePropertyId, componentTypePropertyId, statePropertyId);
   }
 
   /**

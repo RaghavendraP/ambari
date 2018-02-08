@@ -97,6 +97,7 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
   public static final String HOST_COMPONENT_SERVICE_TYPE_PROPERTY_ID = RESPONSE_KEY + PropertyHelper.EXTERNAL_PATH_SEP + "service_type";
   public static final String HOST_COMPONENT_HOST_COMPONENT_ID_PROPERTY_ID = RESPONSE_KEY + PropertyHelper.EXTERNAL_PATH_SEP + "id";
   public static final String HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID = RESPONSE_KEY + PropertyHelper.EXTERNAL_PATH_SEP + "component_name";
+  public static final String HOST_COMPONENT_COMPONENT_TYPE_PROPERTY_ID = RESPONSE_KEY + PropertyHelper.EXTERNAL_PATH_SEP + "component_type";
   public static final String HOST_COMPONENT_DISPLAY_NAME_PROPERTY_ID = RESPONSE_KEY + PropertyHelper.EXTERNAL_PATH_SEP + "display_name";
   public static final String HOST_COMPONENT_HOST_NAME_PROPERTY_ID = RESPONSE_KEY + PropertyHelper.EXTERNAL_PATH_SEP + "host_name";
   public static final String HOST_COMPONENT_PUBLIC_HOST_NAME_PROPERTY_ID = RESPONSE_KEY + PropertyHelper.EXTERNAL_PATH_SEP + "public_host_name";
@@ -123,8 +124,8 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
   public static Map<Resource.Type, String> keyPropertyIds = ImmutableMap.<Resource.Type, String>builder()
       .put(Resource.Type.Cluster, HOST_COMPONENT_CLUSTER_NAME_PROPERTY_ID)
       .put(Resource.Type.Host, HOST_COMPONENT_HOST_NAME_PROPERTY_ID)
-      .put(Resource.Type.HostComponent, HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID)
-      .put(Resource.Type.Component, HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID)
+      .put(Resource.Type.HostComponent, HOST_COMPONENT_HOST_COMPONENT_ID_PROPERTY_ID)
+      .put(Resource.Type.Component, HOST_COMPONENT_HOST_COMPONENT_ID_PROPERTY_ID)
       .build();
 
   /**
@@ -135,7 +136,9 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
       HOST_COMPONENT_CLUSTER_NAME_PROPERTY_ID,
       HOST_COMPONENT_SERVICE_GROUP_NAME_PROPERTY_ID,
       HOST_COMPONENT_SERVICE_NAME_PROPERTY_ID,
+      HOST_COMPONENT_HOST_COMPONENT_ID_PROPERTY_ID,
       HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID,
+      HOST_COMPONENT_COMPONENT_TYPE_PROPERTY_ID,
       HOST_COMPONENT_DISPLAY_NAME_PROPERTY_ID,
       HOST_COMPONENT_HOST_NAME_PROPERTY_ID,
       HOST_COMPONENT_PUBLIC_HOST_NAME_PROPERTY_ID,
@@ -215,6 +218,7 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
         resource.setProperty(HOST_COMPONENT_SERVICE_TYPE_PROPERTY_ID, response.getServiceType());
         resource.setProperty(HOST_COMPONENT_HOST_COMPONENT_ID_PROPERTY_ID, response.getHostComponentId());
         resource.setProperty(HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID, response.getComponentName());
+        resource.setProperty(HOST_COMPONENT_COMPONENT_TYPE_PROPERTY_ID, response.getComponentType());
         resource.setProperty(HOST_COMPONENT_DISPLAY_NAME_PROPERTY_ID, response.getDisplayName());
         resource.setProperty(HOST_COMPONENT_HOST_NAME_PROPERTY_ID, response.getHostname());
         resource.setProperty(HOST_COMPONENT_PUBLIC_HOST_NAME_PROPERTY_ID, response.getPublicHostname());
@@ -287,6 +291,7 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
       setResourceProperty(resource, HOST_COMPONENT_SERVICE_TYPE_PROPERTY_ID, response.getServiceType(), requestedIds);
       setResourceProperty(resource, HOST_COMPONENT_HOST_COMPONENT_ID_PROPERTY_ID, response.getHostComponentId(), requestedIds);
       setResourceProperty(resource, HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID, response.getComponentName(), requestedIds);
+      setResourceProperty(resource, HOST_COMPONENT_COMPONENT_TYPE_PROPERTY_ID, response.getComponentType(), requestedIds);
       setResourceProperty(resource, HOST_COMPONENT_DISPLAY_NAME_PROPERTY_ID, response.getDisplayName(), requestedIds);
       setResourceProperty(resource, HOST_COMPONENT_HOST_NAME_PROPERTY_ID, response.getHostname(), requestedIds);
       setResourceProperty(resource, HOST_COMPONENT_PUBLIC_HOST_NAME_PROPERTY_ID, response.getPublicHostname(), requestedIds);
@@ -472,6 +477,7 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
           new ArrayList<>();
 
         for (String installOnlyComponent : installOnlyComponents) {
+          // TODO : SWAP Check if it should have id.
           Predicate componentNameEquals = new EqualsPredicate<>(HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID, installOnlyComponent);
           // create predicate to filter out the install only component
           listOfComponentPredicates.add(new NotPredicate(componentNameEquals));
@@ -727,6 +733,7 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
         (String) properties.get(HOST_COMPONENT_SERVICE_GROUP_NAME_PROPERTY_ID),
         (String) properties.get(HOST_COMPONENT_SERVICE_NAME_PROPERTY_ID),
         (String) properties.get(HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID),
+        (String) properties.get(HOST_COMPONENT_COMPONENT_TYPE_PROPERTY_ID),
         (String) properties.get(HOST_COMPONENT_HOST_NAME_PROPERTY_ID),
         (String) properties.get(HOST_COMPONENT_DESIRED_STATE_PROPERTY_ID));
     serviceComponentHostRequest.setState((String) properties.get(HOST_COMPONENT_STATE_PROPERTY_ID));
@@ -765,6 +772,7 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
             (String) properties.get(HOST_COMPONENT_SERVICE_GROUP_NAME_PROPERTY_ID),
             (String) properties.get(HOST_COMPONENT_SERVICE_NAME_PROPERTY_ID),
             (String) properties.get(HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID),
+            (String) properties.get(HOST_COMPONENT_COMPONENT_TYPE_PROPERTY_ID),
             (String) properties.get(HOST_COMPONENT_HOST_NAME_PROPERTY_ID),
             (String) properties.get(HOST_COMPONENT_STATE_PROPERTY_ID));
     if (properties.get(HOST_COMPONENT_DESIRED_STATE_PROPERTY_ID) != null) {
@@ -813,7 +821,7 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
     final boolean runSmokeTest = "true".equals(getQueryParameterValue(
         QUERY_PARAMETERS_RUN_SMOKE_TEST_ID, predicate));
 
-    Set<String> queryIds = Collections.singleton(HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID);
+    Set<String> queryIds = Collections.singleton(HOST_COMPONENT_HOST_COMPONENT_ID_PROPERTY_ID);
 
     Request queryRequest = PropertyHelper.getReadRequest(queryIds);
     // will take care of 404 exception
@@ -1055,6 +1063,7 @@ public class HostComponentResourceProvider extends AbstractControllerResourcePro
     public boolean evaluate(Resource resource) {
       boolean isClient = false;
 
+      // TODO : should it be moved to id ?
       String componentName = (String) resource.getPropertyValue(HOST_COMPONENT_COMPONENT_NAME_PROPERTY_ID);
       try {
         if (componentName != null && !componentName.isEmpty()) {

@@ -96,8 +96,10 @@ public class RestMetricsPropertyProvider extends ThreadPoolEnabledPropertyProvid
   private final StreamProvider streamProvider;
   private final String clusterNamePropertyId;
   private final String componentNamePropertyId;
+  private final String componentTypePropertyId;
   private final String statePropertyId;
   private final String componentName;
+  private final String componentType;
 
   private static final String DEFAULT_PORT_PROPERTY = "default_port";
   private static final String PORT_CONFIG_TYPE_PROPERTY = "port_config_type";
@@ -134,6 +136,7 @@ public class RestMetricsPropertyProvider extends ThreadPoolEnabledPropertyProvid
    * @param clusterNamePropertyId   the cluster name property id
    * @param hostNamePropertyId      the host name property id
    * @param componentNamePropertyId the component name property id
+   * @param componentTypePropertyId the component type property id
    * @param statePropertyId         the state property id
    */
   @AssistedInject
@@ -145,15 +148,19 @@ public class RestMetricsPropertyProvider extends ThreadPoolEnabledPropertyProvid
       @Assisted("clusterNamePropertyId") String clusterNamePropertyId,
       @Assisted("hostNamePropertyId") @Nullable String hostNamePropertyId,
       @Assisted("componentNamePropertyId") String componentNamePropertyId,
+      @Assisted("componentTypePropertyId") String componentTypePropertyId,
       @Assisted("statePropertyId") @Nullable String statePropertyId,
-      @Assisted("componentName") @Nullable String componentName) {
+      @Assisted("componentName") @Nullable String componentName,
+      @Assisted("componentType") @Nullable String componentType) {
     super(componentMetrics, hostNamePropertyId, metricHostProvider, clusterNamePropertyId);
     this.metricsProperties = metricsProperties;
     this.streamProvider = streamProvider;
     this.clusterNamePropertyId = clusterNamePropertyId;
     this.componentNamePropertyId = componentNamePropertyId;
+    this.componentTypePropertyId = componentTypePropertyId;
     this.statePropertyId = statePropertyId;
     this.componentName = componentName;
+    this.componentType = componentType;
   }
 
   // ----- MetricsProvider implementation ------------------------------------

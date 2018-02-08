@@ -77,6 +77,12 @@ public interface ServiceComponentHost {
   String getServiceComponentName();
 
   /**
+   * Get the ServiceComponent type this object maps to
+   * @return Name of the ServiceComponentType
+   */
+  String getServiceComponentType();
+
+  /**
    * Get the Host this object maps to
    * @return Host's hostname
    */
